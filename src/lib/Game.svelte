@@ -1,8 +1,8 @@
 <script lang="ts">
     import {getContext, setContext} from 'svelte';
-    import App from "./"
+    import Game from "./game"
     
     export let canvas : HTMLCanvasElement;
-    setContext('game', new App(canvas));
+    setContext('game', new Game(canvas));
 
 </script>
