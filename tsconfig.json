@@ -1,6 +1,10 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
+		"module": "esNext",
+        "target": "es5",
+        "moduleResolution": "node",
+		"noResolve": false,
 		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,

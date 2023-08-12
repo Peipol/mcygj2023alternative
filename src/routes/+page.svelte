@@ -11,6 +11,7 @@
         game = new Game(canvas);
 
         game.setInitialScene();
+        game.debugModeHotKeys()
     })
 </script>
 <canvas bind:this={canvas}/>

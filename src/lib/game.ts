@@ -1,4 +1,27 @@
-import { ArcRotateCamera, CreateSphere, Engine, HemisphericLight, Scene, Vector3 } from '@babylonjs/core';
+import {
+	ArcRotateCamera,
+	CreateBox,
+	CreateGround,
+	Engine,
+	HemisphericLight,
+	Scene,
+	Vector3
+} from '@babylonjs/core';
+//import { Inspector } from '@babylonjs/inspector';
+
+
+const handleInspector = (scene:Scene) => {
+	void Promise.all([
+		import("@babylonjs/core/Debug/debugLayer"),
+		import("@babylonjs/inspector"),
+	]).then((_values) => {
+		console.log(_values);
+		scene.debugLayer.show({
+			handleResize: true,
+			overlay: true,
+		});
+	});
+}
 
 export default class Game {
 	public canvas: HTMLCanvasElement | undefined;
@@ -21,32 +44,48 @@ export default class Game {
 
 		this.camera.attachControl(this.canvas, true);
 
-		const light: HemisphericLight = new HemisphericLight('light', new Vector3(1, 1, 0), this.scene);
+		new HemisphericLight('light', new Vector3(1, 1, 0), this.scene);
 
-		// this.resizeReady(this.engine);
+		this.resizeReady(this.engine);
 	}
 
 	setInitialScene(): void {
-		// create a sphere
-		const sphere = CreateSphere('sphere', { diameter: 2 }, this.scene);
+		// create a box
+		const box = CreateBox('box', { size: 2 }, this.scene);
 
 		// create ground
-		const ground = CreateSphere('ground', { diameter: 10, segments: 10 }, this.scene);
-
+		const ground = CreateGround('ground', { width: 6, height: 6 }, this.scene);
 		// move each mesh as needed
-		sphere.position.y = 1;
+		box.position.y = 1;
 		ground.position.y = -1;
+
+		// add a simple rotation animation
+		this.scene.onBeforeRenderObservable.add(() => {
+			box.rotation.y += 0.01;
+		});
 
 		// start the render loop
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
-		}
-		);
+		});
 	}
 	resizeReady(engine: Engine) {
-		window.addEventListener("resize", () => {
-		  engine.resize();
+		window.addEventListener('resize', () => {
+			engine.resize();
 		});
-	  }
-	
+	}
+
+	debugModeHotKeys() {
+		window.addEventListener('keydown', (ev) => {
+			// Shift+Ctrl+Alt+I
+			if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === 'KeyI') {
+				console.log('debug layer toggle');
+				if (!this.scene.debugLayer.isVisible()) {
+					handleInspector(this.scene);
+				} else {
+					this.scene.debugLayer.hide();
+				}
+			}
+		});
+	}
 }
