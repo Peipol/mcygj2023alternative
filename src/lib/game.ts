@@ -1,3 +1,5 @@
+import "@babylonjs/core/Debug/debugLayer";
+import "@babylonjs/inspector";
 import {
 	ArcRotateCamera,
 	CreateBox,
@@ -7,21 +9,6 @@ import {
 	Scene,
 	Vector3
 } from '@babylonjs/core';
-//import { Inspector } from '@babylonjs/inspector';
-
-
-const handleInspector = (scene:Scene) => {
-	void Promise.all([
-		import("@babylonjs/core/Debug/debugLayer"),
-		import("@babylonjs/inspector"),
-	]).then((_values) => {
-		console.log(_values);
-		scene.debugLayer.show({
-			handleResize: true,
-			overlay: true,
-		});
-	});
-}
 
 export default class Game {
 	public canvas: HTMLCanvasElement | undefined;
@@ -47,6 +34,11 @@ export default class Game {
 		new HemisphericLight('light', new Vector3(1, 1, 0), this.scene);
 
 		this.resizeReady(this.engine);
+
+		this.scene.debugLayer.show({
+			overlay: true,
+			handleResize: true,
+		})
 	}
 
 	setInitialScene(): void {
@@ -69,6 +61,7 @@ export default class Game {
 			this.scene.render();
 		});
 	}
+
 	resizeReady(engine: Engine) {
 		window.addEventListener('resize', () => {
 			engine.resize();
@@ -77,11 +70,15 @@ export default class Game {
 
 	debugModeHotKeys() {
 		window.addEventListener('keydown', (ev) => {
+			console.log(ev);
 			// Shift+Ctrl+Alt+I
 			if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === 'KeyI') {
 				console.log('debug layer toggle');
-				if (!this.scene.debugLayer.isVisible()) {
-					handleInspector(this.scene);
+				if (this.scene.debugLayer.isVisible() === false) {
+					this.scene.debugLayer.show({
+						handleResize: true,
+						overlay: true,
+					});
 				} else {
 					this.scene.debugLayer.hide();
 				}
