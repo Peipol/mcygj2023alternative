@@ -11,6 +11,7 @@
         game = new Game(canvas);
         game.setInitialScene();
         game.debugModeHotKeys();
+        game.importYaNoEsToritoAhoraEsEscarabajito()
         console.log(game);
     })
 </script>

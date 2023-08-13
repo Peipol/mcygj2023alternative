@@ -30,6 +30,7 @@
 	"type": "module",
 	"dependencies": {
 		"@babylonjs/core": "^6.15.0",
-		"@babylonjs/inspector": ">=6.0.0"
+		"@babylonjs/inspector": ">=6.0.0",
+		"@babylonjs/loaders": "^6.16.0"
 	}
 }

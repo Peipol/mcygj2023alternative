@@ -7,8 +7,10 @@ import {
 	Engine,
 	HemisphericLight,
 	Scene,
+	SceneLoader,
 	Vector3
 } from '@babylonjs/core';
+import "@babylonjs/loaders"
 
 export default class Game {
 	public canvas: HTMLCanvasElement | undefined;
@@ -43,17 +45,17 @@ export default class Game {
 
 	setInitialScene(): void {
 		// create a box
-		const box = CreateBox('box', { size: 2 }, this.scene);
+		// const box = CreateBox('box', { size: 2 }, this.scene);
 
 		// create ground
 		const ground = CreateGround('ground', { width: 6, height: 6 }, this.scene);
 		// move each mesh as needed
-		box.position.y = 1;
-		ground.position.y = -1;
+		// box.position.y = 1;
+		ground.position.y = 0;
 
 		// add a simple rotation animation
 		this.scene.onBeforeRenderObservable.add(() => {
-			box.rotation.y += 0.01;
+			// box.rotation.y += 0.05;
 		});
 
 		// start the render loop
@@ -72,7 +74,7 @@ export default class Game {
 		window.addEventListener('keydown', (ev) => {
 			console.log(ev);
 			// Shift+Ctrl+Alt+I
-			if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.code === 'KeyI') {
+			if (ev.shiftKey && ev.code === 'KeyI') {
 				console.log('debug layer toggle');
 				if (this.scene.debugLayer.isVisible() === false) {
 					this.scene.debugLayer.show({
@@ -84,5 +86,14 @@ export default class Game {
 				}
 			}
 		});
+	}
+
+	async importYaNoEsToritoAhoraEsEscarabajito() {
+		const escarabajito = await SceneLoader.ImportMeshAsync(
+			'',
+			'./assets/',
+			'escarabajito.glb')
+
+		console.log("miralo",escarabajito)
 	}
 }
