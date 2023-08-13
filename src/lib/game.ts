@@ -1,9 +1,11 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import {
+	AbstractMesh,
 	ArcRotateCamera,
 	CreateBox,
 	CreateGround,
+	CreateGroundFromHeightMap,
 	Engine,
 	HemisphericLight,
 	Scene,
@@ -24,9 +26,9 @@ export default class Game {
 		this.scene = new Scene(this.engine);
 		this.camera = new ArcRotateCamera(
 			'Camera',
-			Math.PI / 2,
-			Math.PI / 6,
-			10,
+			-Math.PI / 2,
+			Math.PI / 3,
+			20,
 			Vector3.Zero(),
 			this.scene
 		);
@@ -48,7 +50,8 @@ export default class Game {
 		// const box = CreateBox('box', { size: 2 }, this.scene);
 
 		// create ground
-		const ground = CreateGround('ground', { width: 6, height: 6 }, this.scene);
+		// const ground = CreateGround('ground', { width: 100, height: 100 }, this.scene);
+		const ground = CreateGroundFromHeightMap('ground', 'https://doc.babylonjs.com/img/how_to/HeightMap/heightMap.png', {width:100, height:100, subdivisions: 100, maxHeight: 20})
 		// move each mesh as needed
 		// box.position.y = 1;
 		ground.position.y = 0;
@@ -56,6 +59,12 @@ export default class Game {
 		// add a simple rotation animation
 		this.scene.onBeforeRenderObservable.add(() => {
 			// box.rotation.y += 0.05;
+			const boxy = this.scene.getMeshByName("characterMedium_primitive0")
+			if (boxy) {
+
+				boxy.position.y += 0.5
+				this.camera.target = boxy?.getAbsolutePosition()
+			}
 		});
 
 		// start the render loop
@@ -95,5 +104,14 @@ export default class Game {
 			'escarabajito.glb')
 
 		console.log("miralo",escarabajito)
+	}
+
+	async boxy() {
+		const boxy = await SceneLoader.ImportMeshAsync(
+			'',
+			'./assets/',
+			'boxy.glb')
+
+		console.log("miralo",boxy)
 	}
 }

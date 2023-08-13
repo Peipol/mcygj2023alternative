@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Game from "$lib/game"	
+	import type { AbstractMesh } from "@babylonjs/core";
     //import {getContext, setContext} from 'svelte';
     import {onMount} from "svelte";
 
@@ -11,7 +12,8 @@
         game = new Game(canvas);
         game.setInitialScene();
         game.debugModeHotKeys();
-        game.importYaNoEsToritoAhoraEsEscarabajito()
+        game.importYaNoEsToritoAhoraEsEscarabajito();
+        game.boxy();
         console.log(game);
     })
 </script>
