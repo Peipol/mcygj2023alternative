@@ -3,29 +3,41 @@ import "@babylonjs/inspector";
 import {
 	AbstractMesh,
 	ArcRotateCamera,
-	CreateBox,
-	CreateGround,
 	CreateGroundFromHeightMap,
 	Engine,
 	HemisphericLight,
+	Mesh,
 	Scene,
 	SceneLoader,
 	TransformNode,
-	Vector3
+	Vector3,
+	type ISceneLoaderAsyncResult,
+	type Nullable
 } from "@babylonjs/core";
 import "@babylonjs/loaders";
+import Enviroment from "./enviroment";
 import PlayerInput from "./PlayerInput";
+import PlayerController from "./playerController";
 
 export default class Game {
 	public canvas: HTMLCanvasElement | undefined;
 	public engine: Engine;
 	public scene: Scene;
 	public camera: ArcRotateCamera;
+	public playerInput: PlayerInput;
+	public playerController: PlayerController | undefined;
+	/**
+	 * Custom properties
+	 */
+	public enviroment: Enviroment;
+	public player: TransformNode | undefined;
 
 	constructor(gameCanvas: HTMLCanvasElement) {
 		this.canvas = gameCanvas;
 		this.engine = new Engine(this.canvas, false);
 		this.scene = new Scene(this.engine);
+		this.enviroment = new Enviroment(this.scene);
+		this.playerInput = new PlayerInput(this.scene);
 		this.camera = new ArcRotateCamera(
 			"Camera",
 			-Math.PI / 2,
@@ -40,60 +52,21 @@ export default class Game {
 		new HemisphericLight("light", new Vector3(1, 1, 0), this.scene);
 
 		this.resizeReady(this.engine);
-
-		this.scene.debugLayer.show({
-			overlay: true,
-			handleResize: true
-		});
 	}
 
-	setInitialScene(): void {
-		// create a box
-		// const box = CreateBox('box', { size: 2 }, this.scene);
-
-		// create ground
-		// const ground = CreateGround('ground', { width: 100, height: 100 }, this.scene);
-		const ground = CreateGroundFromHeightMap(
-			"ground",
-			"https://doc.babylonjs.com/img/how_to/HeightMap/heightMap.png",
-			{ width: 100, height: 100, subdivisions: 100, maxHeight: 0 }
-		);
-		// move each mesh as needed
-		ground.position.y = 0;
-
-
-		// boxyloxy
-		const boxy = this.scene.getMeshByName("characterMedium_primitive0");
-		const CoT = new TransformNode("CoT");
-		CoT.scaling = new Vector3(1, 1, 1).scale(0.01);
-		CoT.rotation = new Vector3(Math.PI/2, Math.PI * 1/2, Math.PI * 0);
-		if (boxy) boxy.parent = CoT;
-
-		const player = new PlayerInput(this.scene);
-		// add a simple rotation animation
-		this.scene.onBeforeRenderObservable.add(() => {
-			const boxy = this.scene.getMeshByName("characterMedium_primitive0")
-			if (boxy) {
-				if (boxy.parent) boxy.parent = CoT;
-				//CoT.position.addInPlace(boxy.up.scale(0.1));
-				boxy.rotation.z += 0.005;
-				this.camera.target = this.scene.getTransformNodeByName("CoT")?.getAbsolutePosition() || Vector3.Zero();
-			}
-		});
-
-		// start the render loop
+	public renderStart(): void {
 		this.engine.runRenderLoop(() => {
 			this.scene.render();
 		});
 	}
 
-	resizeReady(engine: Engine) {
+	public resizeReady(engine: Engine): void {
 		window.addEventListener("resize", () => {
 			engine.resize();
 		});
 	}
 
-	debugModeHotKeys() {
+	public debugInspector(): void {
 		window.addEventListener("keydown", (ev) => {
 			// Shift+Ctrl+Alt+I
 			if (ev.shiftKey && ev.code === "KeyI") {
@@ -110,34 +83,33 @@ export default class Game {
 		});
 	}
 
-	async importYaNoEsToritoAhoraEsEscarabajito() {
-		const escarabajito = await SceneLoader.ImportMeshAsync("", "./assets/", "escarabajito.glb");
-
+	public async importYaNoEsToritoAhoraEsEscarabajito(): Promise<ISceneLoaderAsyncResult> {
+		const escarabajitoLoader = await SceneLoader.ImportMeshAsync(
+			"",
+			"./assets/",
+			"escarabajito.glb"
+		);
+		console.log("escarabajitoLoader", escarabajitoLoader);
+		return escarabajitoLoader;
 	}
 
-	/*controlWalk() {
-		window.addEventListener("keydown", (ev) => {
-			const CoT = this.scene.getTransformNodeByName("CoT");
-			const boxy = this.scene.getMeshByName("characterMedium_primitive0")
-			if (boxy && CoT) {
-				if (ev.code === "KeyW") {
-					CoT.position.addInPlace(boxy.up.scale(0.1));
-				}
-				if (ev.code === "KeyS") {
-					CoT.position.addInPlace(boxy.up.scale(-0.1));
-				}
-				if (ev.code === "KeyA") {
-					CoT.position.addInPlace(CoT.right.scale(-0.1));
-				}
-				if (ev.code === "KeyD") {
-					CoT.position.addInPlace(CoT.right.scale(0.1));
-				}
-			}
-		});
-	}*/
+	public async importBoxy(): Promise<void> {
+		const boxyLoader = await SceneLoader.ImportMeshAsync("", "./assets/", "boxy.glb");
+		console.log("boxyLoader", boxyLoader);
+	}
 
-	async boxy() {
-		const boxy = await SceneLoader.ImportMeshAsync("", "./assets/", "boxy.glb");
-		boxy.position = new Vector3(5, 5, 0);
+	public async ImportMeshAsync(
+		name: string | "",
+		rootUrl: string,
+		fileName: string
+	): Promise<AbstractMesh[]> {
+		const meshLoader = await SceneLoader.ImportMeshAsync(name, rootUrl, fileName);
+		console.log("meshLoader", meshLoader);
+
+		return meshLoader.meshes;
+	}
+
+	public async setPlayerControllerAsync(playerMesh: AbstractMesh | Mesh) {
+		return new PlayerController(this.scene, playerMesh, this.camera, this.playerInput);
 	}
 }

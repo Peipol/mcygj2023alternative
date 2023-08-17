@@ -9,13 +9,24 @@
     
     let game : Game;
 
-    onMount(() => {
+    onMount(async() => {
         game = new Game(canvas);
-        game.setInitialScene();
-        game.debugModeHotKeys();
-        game.importYaNoEsToritoAhoraEsEscarabajito();
-        game.boxy();
+        const {scene, enviroment} = game
+        //game.enviroment.setBasicScene();
+        //game.setInitialScene();
+        enviroment.setBasicScene()
         
+        const bettleLoader = game.importYaNoEsToritoAhoraEsEscarabajito();
+
+        (await bettleLoader).animationGroups[0].pause();
+        
+        //game.importBoxy();
+
+
+        game.setPlayerControllerAsync((await bettleLoader).meshes[0]);
+        
+        game.renderStart()
+        game.debugInspector();
         console.log(game);
     })
 </script>

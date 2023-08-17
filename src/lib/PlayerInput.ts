@@ -1,90 +1,95 @@
-import { Scene, ActionManager, ExecuteCodeAction, Observer, Scalar, ActionEvent } from '@babylonjs/core';
+import {
+	Scene,
+	ActionManager,
+	ExecuteCodeAction,
+	Scalar,
+} from "@babylonjs/core";
 
-export default class PlayerInput {
+export default class PlayerInput{
+	private scene: Scene;
+	private debug = false
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	public inputMap: any;
+	public horizontal = 0;
+	public vertical = 0;
+	public horizontalAxis = 0;
+	public verticalAxis = 0;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public inputMap: any;
-    private _scene: Scene;
+	public jumpKeyDown = false;
+	public dashing = false;
 
-    //simple movement
-    public horizontal = 0;
-    public vertical = 0;
-    //tracks whether or not there is movement in that axis
-    public horizontalAxis = 0;
-    public verticalAxis = 0;
+	constructor(scene: Scene) {
+		this.scene = scene;
+		this.scene.actionManager = new ActionManager(this.scene);
 
-    //jumping and dashing
-    public jumpKeyDown = false;
-    public dashing = false;
+		this.inputMap = {};
 
-    constructor(scene: Scene) {
+		this.scene.actionManager.registerAction(
+			new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, (evt) => {
+				this.inputMap[(evt.sourceEvent.key as string).toLowerCase()] =
+					evt.sourceEvent.type == "keydown";
+					console.log(this)
+			})
+		);
+		this.scene.actionManager.registerAction(
+			new ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (evt) => {
+				this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+			})
+		);
 
-        this._scene = scene;
+		this.scene.onBeforeRenderObservable.add(() => {
+			console.log(this)
+			this._updateFromKeyboard();
+		});
+	}
 
-        //scene action manager to detect inputs
-        this._scene.actionManager = new ActionManager(this._scene);
+	private _updateFromKeyboard(): void {
+		//forward - backwards movement
+		if (this.inputMap["w"]) {
+			this.verticalAxis = 1;
+			this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
+		} else if (this.inputMap["s"]) {
+			this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
+			this.verticalAxis = -1;
+		} else {
+			this.vertical = 0;
+			this.verticalAxis = 0;
+		}
 
-        this.inputMap = {};
-        this._scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, (evt) => {
-            this.inputMap[(evt.sourceEvent.key as string).toLowerCase()] = evt.sourceEvent.type == "keydown";
-            console.log(this);
-            console.log(evt.sourceEvent.key)
-        }));
-        this._scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (evt) => {
-            this.inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
-        }));
+		/**
+         * LEFT - RIGHT MOVEMENT
+         */
+		if (this.inputMap["a"]) {
+			this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
+			this.horizontalAxis = -1;
+		} else if (this.inputMap["d"]) {
+			this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
+			this.horizontalAxis = 1;
+		} else {
+			this.horizontal = 0;
+			this.horizontalAxis = 0;
+		}
 
-        //add to the scene an observable that calls updateFromKeyboard before rendering
-        scene.onBeforeRenderObservable.add(() => {
-            this._updateFromKeyboard();
-        });
-    }
+		/**
+         * RUNNING
+         */
+		if (this.inputMap["Shift"]) {
+			this.dashing = true;
+		} else {
+			this.dashing = false;
+		}
 
-    // Keyboard controls & Mobile controls
-    //handles what is done when keys are pressed or if on mobile, when buttons are pressed
-    private _updateFromKeyboard(): void {
+		/**
+         * JUMPING
+         */
+		if (this.inputMap[" "]) {
+			this.jumpKeyDown = true;
+		} else {
+			this.jumpKeyDown = false;
+		}
+	}
 
-        //forward - backwards movement
-        if ((this.inputMap["w"])) {
-            this.verticalAxis = 1;
-            this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
-
-        } else if ((this.inputMap["s"])) {
-            this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
-            this.verticalAxis = -1;
-        } else {
-            this.vertical = 0;
-            this.verticalAxis = 0;
-        }
-
-        //left - right movement
-        if ((this.inputMap["a"])) {
-            //lerp will create a scalar linearly interpolated amt between start and end scalar
-            //taking current horizontal and how long you hold, will go up to -1(all the way left)
-            this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
-            this.horizontalAxis = -1;
-
-        } else if ((this.inputMap["d"])) {
-            this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
-            this.horizontalAxis = 1;
-        }
-        else {
-            this.horizontal = 0;
-            this.horizontalAxis = 0;
-        }
-
-        //dash
-        if ((this.inputMap["Shift"])) {
-            this.dashing = true;
-        } else {
-            this.dashing = false;
-        }
-
-        //Jump Checks (SPACE)
-        if ((this.inputMap[" "]) ) {
-            this.jumpKeyDown = true;
-        } else {
-            this.jumpKeyDown = false;
-        }
-    }
+	Debug(): void {
+		this.debug = true
+	}
 }

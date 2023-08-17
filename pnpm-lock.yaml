@@ -28,6 +28,9 @@ devDependencies:
   '@typescript-eslint/parser':
     specifier: ^5.45.0
     version: 5.62.0(eslint@8.46.0)(typescript@5.1.6)
+  babylonjs:
+    specifier: ^6.16.0
+    version: 6.16.0
   eslint:
     specifier: ^8.28.0
     version: 8.46.0
@@ -804,6 +807,11 @@ packages:
   /babylonjs-gltf2interface@6.16.0:
     resolution: {integrity: sha512-9L4h9ffyLojb2msfik2Vg+7K2gyXsqVYBDkozN9SLlqh/jkWiTdzjh18rZp8e2ToPbnWHizDh1hDmpDio6kZKg==}
     dev: false
+
+  /babylonjs@6.16.0:
+    resolution: {integrity: sha512-q85YmfioRYHzCK0SVcFvKWcMdJfUDYiDtPNKHajJV2x8tH8m4FaCBq73IBamoBvl9EXOt0WRHRoBctjd6/lMfA==}
+    requiresBuild: true
+    dev: true
 
   /balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
