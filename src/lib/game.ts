@@ -24,13 +24,12 @@ export default class Game {
 	public engine: Engine;
 	public scene: Scene;
 	public camera: ArcRotateCamera;
-	public playerInput: PlayerInput;
-	public playerController: PlayerController | undefined;
 	/**
 	 * Custom properties
-	 */
+	*/
 	public enviroment: Enviroment;
-	public player: TransformNode | undefined;
+	public playerInput: PlayerInput;
+	public playerController: PlayerController | undefined;
 
 	constructor(gameCanvas: HTMLCanvasElement) {
 		this.canvas = gameCanvas;

@@ -1,13 +1,17 @@
 <script lang="ts">
-	import PlayerInput from "$lib/PlayerInput";
+	import type PlayerInput from "$lib/PlayerInput";
 	import Game from "$lib/game"	
 	import type { AbstractMesh } from "@babylonjs/core";
     //import {getContext, setContext} from 'svelte';
     import {onMount} from "svelte";
+	import { writable } from "svelte/store";
 
     let canvas : HTMLCanvasElement;
     
     let game : Game;
+    
+    
+    let inputMap = writable<PlayerInput["inputMap"]>({})
 
     onMount(async() => {
         game = new Game(canvas);
@@ -24,12 +28,15 @@
 
 
         game.setPlayerControllerAsync((await bettleLoader).meshes[0]);
+
+        inputMap.set(game.playerInput.inputMap);
         
         game.renderStart()
         game.debugInspector();
         console.log(game);
     })
 </script>
+<h1>{JSON.stringify(inputMap)}</h1>
 <canvas bind:this={canvas}/>
 
 <style>
@@ -41,5 +48,11 @@
     canvas {
         width: 100vw;
         height: 100vh;
+    }
+    h1 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
     }
 </style>
