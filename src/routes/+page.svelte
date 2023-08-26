@@ -25,7 +25,7 @@
 
         (await bettleLoader).animationGroups[0].pause();
         
-        //game.importBoxy();
+        game.importBoxy();
 
 
         game.setPlayerControllerAsync((await bettleLoader).meshes[0]);
