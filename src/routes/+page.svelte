@@ -10,8 +10,9 @@
     
     let game : Game;
     
+    let inputMap = writable<string>("{}")
     
-    let inputMap = writable<PlayerInput["inputMap"]>({})
+    inputMap.subscribe((v)=>console.log("inputs",v))
 
     onMount(async() => {
         game = new Game(canvas);
@@ -28,6 +29,13 @@
 
 
         game.setPlayerControllerAsync((await bettleLoader).meshes[0]);
+        // create a window key event
+            window.addEventListener("keydown", (e) => {
+                inputMap.set(JSON.stringify(game.playerInput.inputMap));
+            });
+            window.addEventListener("keyup", (e) => {
+                inputMap.set(JSON.stringify(game.playerInput.inputMap));
+            });
 
         inputMap.set(game.playerInput.inputMap);
         
@@ -36,7 +44,7 @@
         console.log(game);
     })
 </script>
-<h1>{JSON.stringify(inputMap)}</h1>
+<h1>{$inputMap}</h1>
 <canvas bind:this={canvas}/>
 
 <style>

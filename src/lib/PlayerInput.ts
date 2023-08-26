@@ -16,9 +16,10 @@ export default class PlayerInput{
 	public verticalAxis = 0;
 
 	public jumpKeyDown = false;
+	public crouch = false;
 	public dashing = false;
 
-	public boost = 0.01;
+	public boost = 0.1;
 
 	constructor(scene: Scene) {
 		this.scene = scene;
@@ -28,7 +29,7 @@ export default class PlayerInput{
 
 		this.scene.actionManager.registerAction(
 			new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, (evt) => {
-				this.inputMap[(evt.sourceEvent.key as string).toLowerCase()] =
+				this.inputMap[evt.sourceEvent.key] =
 					evt.sourceEvent.type == "keydown";
 			})
 		);
@@ -41,6 +42,7 @@ export default class PlayerInput{
 		this.scene.onBeforeRenderObservable.add(() => {
 			this._updateFromKeyboard();
 		});
+
 	}
 
 	private _updateFromKeyboard(): void {
@@ -77,6 +79,16 @@ export default class PlayerInput{
 			this.dashing = true;
 		} else {
 			this.dashing = false;
+		}
+
+		
+		/**
+         * CRUNCHING
+         */
+		if (this.inputMap["Control"]) {
+			this.crouch = true;
+		} else {
+			this.crouch = false;
 		}
 
 		/**
