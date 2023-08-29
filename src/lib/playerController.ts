@@ -1,4 +1,4 @@
-import { AbstractMesh, Mesh, Scene, TransformNode, ArcRotateCamera } from "@babylonjs/core";
+import { AbstractMesh, Mesh, Scene, TransformNode, ArcRotateCamera, Vector3, Quaternion } from "@babylonjs/core";
 import type PlayerInput from "./PlayerInput";
 
 export default class PlayerController extends TransformNode {
@@ -27,23 +27,29 @@ export default class PlayerController extends TransformNode {
 
 	moveAnimationHandler() {
 		this.scene.onBeforeRenderObservable.add(() => {
-			this.position.z += this.playerInput.vertical * this.speed;
-			this.position.x += this.playerInput.horizontal * this.speed;
+			this.rotation.y = this.camera.absoluteRotation.toEulerAngles()._y;
+			//this.position.addInPlace(this.mesh.forward.scale(this.playerInput.vertical * this.speed));
+			this.position.x += this.forward.x * this.playerInput.vertical * this.speed;
+			this.position.z += this.forward.z * this.playerInput.vertical * this.speed;
+			this.position.x += 1 * this.right.x * this.playerInput.horizontal * this.speed;
+			this.position.z += 1 * this.right.z * this.playerInput.horizontal * this.speed;
 
+			//this.mesh.rotation = new Vector3(0 *Math.PI, 1/2 *Math.PI,0 *Math.PI);
             if (this.playerInput.vertical > 0) {
 				this.scene.getAnimationGroupByName("Armature|mixamo.com|Layer0")?.play();
-				this.rotation.y = 0;
+				this.mesh.rotation = new Vector3(0 * Math.PI, 1 * Math.PI,0 * Math.PI);
 			} else if (this.playerInput.vertical < 0) {
 				this.scene.getAnimationGroupByName("Armature|mixamo.com|Layer0")?.play();
-				this.rotation.y = Math.PI;
+				this.mesh.rotation = new Vector3(0 * Math.PI, 2 * Math.PI,0 * Math.PI);
 			} else if (this.playerInput.horizontal > 0) {
 				this.scene.getAnimationGroupByName("Armature|mixamo.com|Layer0")?.play();
-				this.rotation.y = Math.PI / 2;
+				this.mesh.rotation = new Vector3(0 * Math.PI, -1/2 * Math.PI,0 * Math.PI);
 			} else if (this.playerInput.horizontal < 0) {
 				this.scene.getAnimationGroupByName("Armature|mixamo.com|Layer0")?.play();
-				this.rotation.y = -Math.PI / 2;
+				this.mesh.rotation = new Vector3(0 * Math.PI, 1/2 * Math.PI,0 * Math.PI);
 			} else {
-				this.scene.getAnimationGroupByName("Armature|mixamo.com|Layer0")?.stop();
+				this.scene.getAnimationGroupByName("Armature|mixamo.com|Layer0")?.reset();
+				//this.mesh.rotation = new Vector3(0 * Math.PI, 1 * Math.PI,0 * Math.PI);
 			}
 		});
 	}
